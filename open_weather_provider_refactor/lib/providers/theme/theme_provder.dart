@@ -1,22 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:open_weather_provider_refactor/constants/constants.dart';
 import 'package:open_weather_provider_refactor/providers/providers.dart';
 
 part 'theme_state.dart';
 
-class ThemeProvider with ChangeNotifier {
-  ThemeState _state = ThemeState.initial();
-  ThemeState get state => _state;
+class ThemeProvider {
+  final WeatherProvider wp;
 
-  void update(WeatherProvider wp) {
+  ThemeProvider({required this.wp});
+
+  ThemeState get state {
     if (wp.state.weather.temp > kWarmOrNot) {
-      _state = _state.copyWith(appTheme: AppTheme.light);
+      return ThemeState();
     } else {
-      _state = _state.copyWith(appTheme: AppTheme.dark);
+      return ThemeState(appTheme: AppTheme.dark);
     }
-
-    print('Theme state : ${_state}');
-
-    notifyListeners();
   }
 }
