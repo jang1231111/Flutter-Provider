@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_weather_provider/constants/constants.dart';
@@ -12,7 +13,7 @@ class WeatherApiServices {
 
   WeatherApiServices({required this.httpClient});
 
-  Future<DirectGeocoding> getDirectGeocoding(String city) async {
+  Future<DirectGeocoding> getDirectGeoCoding(String city) async {
     final Uri uri = Uri(
       scheme: 'https',
       host: kApiHost,
@@ -34,18 +35,17 @@ class WeatherApiServices {
       final responseBody = json.decode(response.body);
 
       if (responseBody.isEmpty) {
-        throw WeatherException('Cannot get the location of $city');
+        throw WeatherException('Cannnot get the location of $city');
       }
 
       final directGeocoding = DirectGeocoding.fromJson(responseBody);
-
       return directGeocoding;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<Weather> getWeather(DirectGeocoding directGeocoding) async {
+  Future<Weather> getWehater(DirectGeocoding directGeocoding) async {
     final Uri uri = Uri(
       scheme: 'https',
       host: kApiHost,
@@ -59,15 +59,14 @@ class WeatherApiServices {
     );
 
     try {
-      final http.Response response = await httpClient.get(uri);
+      http.Response response = await httpClient.get(uri);
 
       if (response.statusCode != 200) {
         throw Exception(httpErrorHandler(response));
       }
+      final responseBody = jsonDecode(response.body);
 
-      final responseBody = json.decode(response.body);
-
-      final weather = Weather.fromJson(responseBody);
+      Weather weather = Weather.fromJson(responseBody);
 
       return weather;
     } catch (e) {

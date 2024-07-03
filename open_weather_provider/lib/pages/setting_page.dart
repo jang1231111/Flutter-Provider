@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:open_weather_provider/providers/providers.dart';
+import 'package:open_weather_provider/providers/settings/settings_provider.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -17,10 +17,12 @@ class SettingsPage extends StatelessWidget {
           title: Text('Temeprature Unit'),
           subtitle: Text('Celsius/Fahrenheit (Default: Celsius)'),
           trailing: Switch(
-            value: context.watch<TempSettingsProvider>().state.tempUnit ==
-                TempUnit.celsius,
+            value: context.watch<SettingsState>().temperatureType ==
+                    TemperatureType.Celsius
+                ? true
+                : false,
             onChanged: (_) {
-              context.read<TempSettingsProvider>().toggleTempUnit();
+              context.read<SettingsProvider>().toggleTemepratureType();
             },
           ),
         ),

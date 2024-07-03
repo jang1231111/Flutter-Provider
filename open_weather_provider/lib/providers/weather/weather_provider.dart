@@ -1,33 +1,24 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_state_notifier/flutter_state_notifier.dart';
 import 'package:open_weather_provider/models/custom_error.dart';
 import 'package:open_weather_provider/models/weather.dart';
 import 'package:open_weather_provider/repositories/weather_repository.dart';
 
 part 'weather_state.dart';
 
-class WeatherProvider with ChangeNotifier {
-  WeatherState _state = WeatherState.initial();
-  WeatherState get state => _state;
+class WeatherProvider extends StateNotifier<WeatherState> with LocatorMixin {
+  WeatherProvider() : super(WeatherState.initial());
 
-  final WeatherRepository weatherRepository;
-  WeatherProvider({required this.weatherRepository});
+  void fetchWeather(String city) async {
+    state = state.copyWith(status: WeatherStatus.loading);
 
-  Future<void> fetchWeather(String city) async {
-    _state = state.copyWith(status: WeatherStatus.loading);
-    notifyListeners();
     try {
-      final Weather weather = await weatherRepository.fetchWeather(city);
-
-      _state = state.copyWith(
-        status: WeatherStatus.loaded,
-        weather: weather,
-      );
-      print('state : $_state');
-      notifyListeners();
+      final Weather weather =
+          await read<WeatherRepository>().fetchWeather(city);
+      state = state.copyWith(status: WeatherStatus.loaded, weather: weather);
+      print('state: $state');
     } on CustomError catch (e) {
-      _state = state.copyWith(status: WeatherStatus.error, customError: e);
-      print('state : $_state');
-      notifyListeners();
+      state = state.copyWith(status: WeatherStatus.error, error: e);
+      print('state: $state');
     }
   }
 }

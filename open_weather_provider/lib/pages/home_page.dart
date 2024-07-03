@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:open_weather_provider/constants/constants.dart';
 import 'package:open_weather_provider/pages/search_page.dart';
 import 'package:open_weather_provider/pages/setting_page.dart';
-import 'package:open_weather_provider/providers/providers.dart';
-import 'package:open_weather_provider/widgets/error_dialog.dart';
+import 'package:open_weather_provider/providers/settings/settings_provider.dart';
+import 'package:open_weather_provider/providers/weather/weather_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:recase/recase.dart';
 
@@ -16,47 +16,49 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? _city;
-  late final WeatherProvider _weatherProv;
+  late WeatherProvider _weahterProv;
+  late void Function() _removeListener;
 
   @override
   void initState() {
     super.initState();
-    _weatherProv = context.read<WeatherProvider>();
-    _weatherProv.addListener(_registerListener);
+    _weahterProv = context.read<WeatherProvider>();
+    _removeListener = _weahterProv.addListener(_registerListener);
   }
 
   @override
   void dispose() {
-    _weatherProv.removeListener(_registerListener);
+    _removeListener();
     super.dispose();
   }
 
-  void _registerListener() {
-    final WeatherState ws = context.read<WeatherProvider>().state;
+  void _registerListener(WeatherState ws) {
+    WeatherState ws = context.read<WeatherState>();
 
     if (ws.status == WeatherStatus.error) {
-      return errorDialog(context, ws.error.errMsg);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text(ws.error.errMsg),
+          );
+        },
+      );
     }
   }
 
-  // _fetchWeather() {
-  //   WidgetsBinding.instance.addPostFrameCallback(
-  //     (_) async {
-  //       await context.read<WeatherProvider>().fetchWeather('London');
-  //     },
-  //   );
-  // }
-
   String showTemperature(double temperature) {
-    final tempUnit = context.watch<TempSettingsProvider>().state.tempUnit;
-    if (tempUnit == TempUnit.fahrenheit) {
+    SettingsState settingsState = context.watch<SettingsState>();
+
+    if (settingsState.temperatureType == TemperatureType.Fahrenheit) {
       return ((temperature * 9 / 4) + 32).toStringAsFixed(2) + '℉';
     }
+
     return temperature.toStringAsFixed(2) + '℃';
   }
 
   Widget _showWeater() {
-    final state = context.watch<WeatherProvider>().state;
+    final state = context.watch<WeatherState>();
 
     if (state.status == WeatherStatus.initial) {
       return Center(
@@ -68,11 +70,9 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (state.status == WeatherStatus.loading) {
-      if (state.status == WeatherStatus.loading) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      }
+      return Center(
+        child: const CircularProgressIndicator(),
+      );
     }
 
     if (state.status == WeatherStatus.error && state.weather.name == '') {
@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
               width: 10.0,
             ),
             Text(
-              '(${state.weather.country})',
+              state.weather.country,
               style: const TextStyle(fontSize: 18.0),
             )
           ],
@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Weather'),
+        title: const Text('Bluetooth'),
         actions: [
           IconButton(
             icon: Icon(Icons.search_rounded),
@@ -195,7 +195,7 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               );
-              print('city: $_city');
+
               if (_city != null) {
                 context.read<WeatherProvider>().fetchWeather(_city!);
               }

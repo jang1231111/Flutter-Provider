@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_state_notifier/flutter_state_notifier.dart';
 import 'package:open_weather_provider/pages/home_page.dart';
-import 'package:open_weather_provider/providers/providers.dart';
+import 'package:open_weather_provider/providers/settings/settings_provider.dart';
+import 'package:open_weather_provider/providers/theme/theme_provider.dart';
+import 'package:open_weather_provider/providers/theme/theme_state.dart';
 import 'package:open_weather_provider/providers/weather/weather_provider.dart';
 import 'package:open_weather_provider/repositories/weather_repository.dart';
 import 'package:open_weather_provider/services/weather_api_services.dart';
@@ -22,30 +25,23 @@ class MyApp extends StatelessWidget {
       providers: [
         Provider<WeatherRepository>(
           create: (context) => WeatherRepository(
-            weatherApiServices: WeatherApiServices(
-              httpClient: http.Client(),
-            ),
-          ),
+              weatherApiServices:
+                  WeatherApiServices(httpClient: http.Client())),
         ),
-        ChangeNotifierProvider<WeatherProvider>(
-          create: (context) => WeatherProvider(
-            weatherRepository: context.read<WeatherRepository>(),
-          ),
+        StateNotifierProvider<WeatherProvider, WeatherState>(
+          create: (context) => WeatherProvider(),
         ),
-        ChangeNotifierProvider<TempSettingsProvider>(
-          create: (context) => TempSettingsProvider(),
+        StateNotifierProvider<SettingsProvider, SettingsState>(
+          create: (context) => SettingsProvider(),
         ),
-        ChangeNotifierProxyProvider<WeatherProvider, ThemeProvider>(
+        StateNotifierProvider<ThemeProvider, ThemeState>(
           create: (context) => ThemeProvider(),
-          update: (BuildContext context, WeatherProvider weatherProvider,
-                  ThemeProvider? themeProvider) =>
-              themeProvider!..update(weatherProvider),
-        )
+        ),
       ],
       builder: (context, _) => MaterialApp(
-        title: 'Weather App',
+        title: 'Bluetooth App',
         debugShowCheckedModeBanner: false,
-        theme: context.watch<ThemeProvider>().state.appTheme == AppTheme.light
+        theme: context.watch<ThemeState>().appTheme == AppTheme.light
             ? ThemeData.light()
             : ThemeData.dark(),
         home: const HomePage(),

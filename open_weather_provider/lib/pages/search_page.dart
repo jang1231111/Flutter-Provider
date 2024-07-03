@@ -43,7 +43,7 @@ class _SearchPageState extends State<SearchPage> {
                 autofocus: true,
                 style: TextStyle(fontSize: 18.0),
                 decoration: InputDecoration(
-                  labelText: 'City name',
+                  labelText: 'Box name',
                   hintText: 'more than 2 characters',
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
@@ -63,7 +63,7 @@ class _SearchPageState extends State<SearchPage> {
             ElevatedButton(
                 onPressed: _submit,
                 child: const Text(
-                  "how's weahter?",
+                  "Device Search",
                   style: TextStyle(fontSize: 20.0),
                 ))
           ],

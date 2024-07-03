@@ -8,46 +8,36 @@ enum WeatherStatus {
 }
 
 class WeatherState {
-  final WeatherStatus status;
-  final Weather weather;
-  final CustomError error;
+  Weather weather;
+  WeatherStatus status;
+  CustomError error;
 
-  WeatherState(
-      {required this.status, required this.weather, required this.error});
-
-  WeatherState copyWith({
-    WeatherStatus? status,
-    Weather? weather,
-    CustomError? customError,
-  }) {
-    return WeatherState(
-      status: status ?? this.status,
-      weather: weather ?? this.weather,
-      error: customError ?? this.error,
-    );
-  }
+  WeatherState({
+    required this.weather,
+    required this.status,
+    required this.error,
+  });
 
   factory WeatherState.initial() {
     return WeatherState(
-        status: WeatherStatus.initial,
         weather: Weather.initial(),
-        error: CustomError());
+        status: WeatherStatus.initial,
+        error: CustomError(errMsg: ''));
   }
 
   @override
   String toString() =>
-      'WeatherState(status: $status, weather: $weather, customError: $error)';
+      'WeatherState(weather: $weather, status: $status, error: $error)';
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is WeatherState &&
-        other.status == status &&
-        other.weather == weather &&
-        other.error == error;
+  WeatherState copyWith({
+    Weather? weather,
+    WeatherStatus? status,
+    CustomError? error,
+  }) {
+    return WeatherState(
+      weather: weather ?? this.weather,
+      status: status ?? this.status,
+      error: error ?? this.error,
+    );
   }
-
-  @override
-  int get hashCode => status.hashCode ^ weather.hashCode ^ error.hashCode;
 }
