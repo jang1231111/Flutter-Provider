@@ -6,7 +6,7 @@ enum TempUnit {
 }
 
 class TempSettingsState {
-  final TempUnit tempUnit;
+  TempUnit tempUnit;
 
   TempSettingsState({
     this.tempUnit = TempUnit.celsius,
