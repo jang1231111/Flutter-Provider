@@ -36,7 +36,7 @@ class _SigninPageState extends State<ProfilePage> {
     final String uid = context.read<fbAuth.User?>()!.uid;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProfileProvider>().getProfile(uid: 'uid');
+      context.read<ProfileProvider>().getProfile(uid: uid);
     });
   }
 
